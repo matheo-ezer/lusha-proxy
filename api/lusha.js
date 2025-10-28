@@ -6,10 +6,30 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Unauthorized' });
   }
 
+  // 🔎 DEBUG : test de connectivité sortante
+  if (req.url.startsWith('/debug')) {
+    try {
+      const r = await fetch('https://api.ipify.org?format=json');
+      const ip = await r.json();
+      return res.status(200).json({
+        ok: true,
+        ip,
+        note: '✅ Sortie HTTP depuis Vercel OK — la connexion externe fonctionne'
+      });
+    } catch (e) {
+      return res.status(500).json({
+        ok: false,
+        error: String(e),
+        note: '❌ Erreur réseau : la sortie HTTP depuis Vercel ne marche pas'
+      });
+    }
+  }
+
+  // 🔁 Requête proxy vers l’API Lusha
   const targetUrl = 'https://api.lusha.com' + req.url;
 
   try {
-    console.log('[lusha-proxy] Fetching:', targetUrl);
+    console.log('[Lusha Proxy] Calling:', targetUrl);
 
     const lushaResp = await fetch(targetUrl, {
       method: req.method,
@@ -21,7 +41,7 @@ export default async function handler(req, res) {
       body: req.method === 'GET' ? undefined : JSON.stringify(req.body || {})
     });
 
-    console.log('[lusha-proxy] Status:', lushaResp.status);
+    console.log('[Lusha Proxy] Status:', lushaResp.status);
 
     const contentType = lushaResp.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
@@ -33,7 +53,10 @@ export default async function handler(req, res) {
       return res.send(text);
     }
   } catch (err) {
-    console.error('[lusha-proxy] Error:', err?.stack || err?.message || err);
-    return res.status(500).json({ error: String(err?.message || err || 'Proxy error') });
+    console.error('[Lusha Proxy] Error:', err?.message || err);
+    return res.status(500).json({
+      error: String(err?.message || err || 'Proxy error'),
+      note: '⚠️ Erreur interne côté proxy'
+    });
   }
 }
