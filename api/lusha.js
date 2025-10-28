@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     }
   
     // Construit l'URL cible de l'API Lusha
-    const targetUrl = 'https://api.lusha.co' + req.url;
+    + const targetUrl = 'https://api.lusha.com' + req.url;
   
     try {
       const lushaResp = await fetch(targetUrl, {
