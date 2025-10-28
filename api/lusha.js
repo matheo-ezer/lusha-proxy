@@ -1,16 +1,18 @@
 export default async function handler(req, res) {
+    // Vérifie le secret
     const clientSecret = req.headers['x-proxy-secret'];
     if (!process.env.PROXY_SECRET || clientSecret !== process.env.PROXY_SECRET) {
       return res.status(403).json({ error: 'Unauthorized' });
     }
   
+    // Construit l'URL cible de l'API Lusha
     const targetUrl = 'https://api.lusha.co' + req.url;
   
     try {
       const lushaResp = await fetch(targetUrl, {
         method: req.method,
         headers: {
-          'Authorization': `Bearer ${process.env.LUSHA_API_KEY}`,
+          'api_key': process.env.LUSHA_API_KEY, // ✅ header correct pour Lusha
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
