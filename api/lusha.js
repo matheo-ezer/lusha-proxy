@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export default async function handler(req, res) {
     // Vérifie le secret
     const clientSecret = req.headers['x-proxy-secret'];
