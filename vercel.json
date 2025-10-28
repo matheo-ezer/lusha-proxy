@@ -1,10 +1,16 @@
 {
     "version": 2,
+    "functions": {
+      "api/*.js": {
+        "runtime": "nodejs20.x",
+        "memory": 256,
+        "maxDuration": 10
+      }
+    },
     "builds": [
       { "src": "api/lusha.js", "use": "@vercel/node" }
     ],
     "routes": [
       { "src": "/(.*)", "dest": "api/lusha.js" }
     ]
-  }
-  
+  }  
