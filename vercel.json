@@ -6,11 +6,5 @@
         "memory": 256,
         "maxDuration": 10
       }
-    },
-    "builds": [
-      { "src": "api/lusha.js", "use": "@vercel/node" }
-    ],
-    "routes": [
-      { "src": "/(.*)", "dest": "api/lusha.js" }
-    ]
-  }  
+    }
+}
