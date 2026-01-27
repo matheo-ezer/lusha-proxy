@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funnel Block</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 60px;
+            max-width: 1000px;
+            width: 100%;
+            align-items: flex-start;
+        }
+
+        /* Left Section */
+        .journey-section {
+            flex: 1;
+            max-width: 440px;
+        }
+
+        .journey-card {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 28px 24px;
+            margin-bottom: 20px;
+        }
+
+        .journey-title {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .accordion-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .accordion-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .accordion-item.active {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 22px;
+        }
+
+        .accordion-header h3 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .accordion-arrow {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-arrow {
+            transform: rotate(0deg);
+        }
+
+        .accordion-item:not(.active) .accordion-arrow {
+            transform: rotate(0deg);
+        }
+
+        .accordion-arrow svg {
+            width: 7px;
+            height: 12px;
+            stroke: rgba(255, 255, 255, 0.4);
+            transition: stroke 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-arrow svg {
+            stroke: #ff6634;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 200px;
+        }
+
+        .accordion-content p {
+            padding: 0 22px 20px 22px;
+            font-size: 14px;
+            line-height: 1.65;
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        .process-section {
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 28px 24px;
+        }
+
+        .process-title {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .process-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 20px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .process-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .process-item h3 {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .process-arrow {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .process-arrow svg {
+            width: 7px;
+            height: 12px;
+            stroke: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Right Section - Funnel */
+        .funnel-section {
+            flex: 1;
+            max-width: 380px;
+            padding-top: 10px;
+        }
+
+        .funnel-note {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .funnel-note p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.45);
+            line-height: 1.6;
+        }
+
+        .funnel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .funnel-stage {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .funnel-label {
+            background: #333333;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+            margin-bottom: -14px;
+            z-index: 10;
+            position: relative;
+        }
+
+        /* Funnel SVG shapes */
+        .funnel-shape-wrapper {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .funnel-shape-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .funnel-shape-svg .shape-fill {
+            fill: #2d2d2d;
+            transition: fill 0.3s ease;
+        }
+
+        .funnel-stage.active .funnel-shape-svg .shape-fill {
+            fill: #ff6634;
+        }
+
+        .funnel-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 90%;
+            padding-top: 8px;
+        }
+
+        .funnel-stage-sqls .funnel-content,
+        .funnel-stage-opportunities .funnel-content {
+            padding-top: 0;
+            top: 42%;
+        }
+
+        .funnel-value {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: #ffffff;
+            white-space: nowrap;
+        }
+
+        .funnel-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.4;
+        }
+
+        /* Stage specific widths */
+        .funnel-stage-leads .funnel-shape-wrapper {
+            width: 100%;
+        }
+
+        .funnel-stage-mqls {
+            margin-top: -2px;
+        }
+
+        .funnel-stage-mqls .funnel-shape-wrapper {
+            width: 82%;
+        }
+
+        .funnel-stage-sqls {
+            margin-top: -2px;
+        }
+
+        .funnel-stage-sqls .funnel-shape-wrapper {
+            width: 66%;
+        }
+
+        .funnel-stage-opportunities {
+            margin-top: -2px;
+        }
+
+        .funnel-stage-opportunities .funnel-shape-wrapper {
+            width: 52%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Section -->
+        <div class="journey-section">
+            <div class="journey-card">
+                <p class="journey-title">We take care of the entire user journey</p>
+
+                <div class="accordion-item active" data-target="leads">
+                    <div class="accordion-header">
+                        <h3>Omnichannel engagement</h3>
+                        <div class="accordion-arrow">
+                            <svg viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 1L7 7L1 13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <p>We develop a comprehensive plan that combines email, LinkedIn, and cold calling to reach your prospects at the right time and in the right place.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-target="mqls">
+                    <div class="accordion-header">
+                        <h3>Activation</h3>
+                        <div class="accordion-arrow">
+                            <svg viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 1L7 7L1 13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Prospects engage by replying to emails, subscribing to newsletters, clicking on ads, answering in WhatsApp, attending a webinar, etc.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item" data-target="sqls">
+                    <div class="accordion-header">
+                        <h3>Conversion</h3>
+                        <div class="accordion-arrow">
+                            <svg viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 1L7 7L1 13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Converting engaged prospects into qualified meetings through strategic follow-up and personalized outreach.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-section">
+                <p class="process-title">Your part in the process</p>
+                <div class="process-item" data-target="opportunities">
+                    <h3>Deal closure</h3>
+                    <div class="process-arrow">
+                        <svg viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L7 7L1 13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section - Funnel -->
+        <div class="funnel-section">
+            <div class="funnel-note">
+                <p>* Average yearly outcomes.<br>The results depend on multiple factors.</p>
+            </div>
+
+            <div class="funnel">
+                <!-- Leads - Top trapezoid -->
+                <div class="funnel-stage funnel-stage-leads active" data-stage="leads">
+                    <span class="funnel-label">Leads</span>
+                    <div class="funnel-shape-wrapper">
+                        <svg class="funnel-shape-svg" viewBox="0 0 380 120" preserveAspectRatio="none">
+                            <path class="shape-fill" d="M0,0 L380,0 L350,120 L30,120 Z"/>
+                        </svg>
+                        <div class="funnel-content">
+                            <p class="funnel-value">Up to 18,000* prospects</p>
+                            <p class="funnel-description">within your client profile</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MQLs - Second trapezoid -->
+                <div class="funnel-stage funnel-stage-mqls" data-stage="mqls">
+                    <span class="funnel-label">MQLs</span>
+                    <div class="funnel-shape-wrapper">
+                        <svg class="funnel-shape-svg" viewBox="0 0 312 100" preserveAspectRatio="none">
+                            <path class="shape-fill" d="M0,0 L312,0 L280,100 L32,100 Z"/>
+                        </svg>
+                        <div class="funnel-content">
+                            <p class="funnel-value">Up to 9,000*</p>
+                            <p class="funnel-description">marketing-qualified leads</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SQLs - Arrow shape pointing down -->
+                <div class="funnel-stage funnel-stage-sqls" data-stage="sqls">
+                    <span class="funnel-label">SQLs</span>
+                    <div class="funnel-shape-wrapper">
+                        <svg class="funnel-shape-svg" viewBox="0 0 250 110" preserveAspectRatio="none">
+                            <path class="shape-fill" d="M0,0 L250,0 L230,70 L250,70 L125,110 L0,70 L20,70 Z"/>
+                        </svg>
+                        <div class="funnel-content">
+                            <p class="funnel-value">200* sales-qualified meetings</p>
+                            <p class="funnel-description">with decision-makers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opportunities - Bottom arrow -->
+                <div class="funnel-stage funnel-stage-opportunities" data-stage="opportunities">
+                    <span class="funnel-label">Opportunities</span>
+                    <div class="funnel-shape-wrapper">
+                        <svg class="funnel-shape-svg" viewBox="0 0 200 95" preserveAspectRatio="none">
+                            <path class="shape-fill" d="M0,0 L200,0 L175,55 L200,55 L100,95 L0,55 L25,55 Z"/>
+                        </svg>
+                        <div class="funnel-content">
+                            <p class="funnel-value">10-30* closed deals</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            const processItem = document.querySelector('.process-item');
+            const funnelStages = document.querySelectorAll('.funnel-stage');
+
+            function setActiveStage(target) {
+                // Remove active from all funnel stages
+                funnelStages.forEach(stage => {
+                    stage.classList.remove('active');
+                });
+
+                // Add active to target stage
+                const targetStage = document.querySelector(`[data-stage="${target}"]`);
+                if (targetStage) {
+                    targetStage.classList.add('active');
+                }
+            }
+
+            function setActiveAccordion(clickedItem) {
+                // Remove active from all accordion items
+                accordionItems.forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Add active to clicked item
+                clickedItem.classList.add('active');
+
+                // Update funnel
+                const target = clickedItem.getAttribute('data-target');
+                setActiveStage(target);
+            }
+
+            // Accordion click handlers
+            accordionItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    setActiveAccordion(this);
+                });
+            });
+
+            // Process item click handler
+            if (processItem) {
+                processItem.addEventListener('click', function() {
+                    // Remove active from all accordion items
+                    accordionItems.forEach(item => {
+                        item.classList.remove('active');
+                    });
+
+                    // Update funnel
+                    const target = this.getAttribute('data-target');
+                    setActiveStage(target);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
